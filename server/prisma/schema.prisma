@@ -1,0 +1,46 @@
+generator client {
+  provider = "prisma-client-js"
+  engineType = "library"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model User {
+  id            String            @id @default(uuid())
+  githubId      String            @unique
+  username      String            @unique
+  name          String?
+  avatarUrl     String?
+  snapshots     ProfileSnapshot[]
+  roadmaps      Roadmap[]
+  createdAt     DateTime          @default(now())
+  updatedAt     DateTime          @updatedAt
+}
+
+model ProfileSnapshot {
+  id                  String   @id @default(uuid())
+  userId              String
+  user                User     @relation(fields: [userId], references: [id])
+  totalRepos          Int
+  activeRepoCount     Int
+  totalStars          Int
+  commitsLast90Days   Int
+  backendScore        Float
+  frontendScore       Float
+  systemsScore        Float
+  consistencyScore    Float
+  calculatedLevel     String
+  createdAt           DateTime @default(now())
+}
+
+model Roadmap {
+  id              String   @id @default(uuid())
+  userId          String
+  user            User     @relation(fields: [userId], references: [id])
+  targetCompany   String
+  missingSkills   String   // Stored as comma-separated string for SQLite
+  geminiPayload   String   // Stored as JSON string for maximum SQLite compatibility
+  createdAt       DateTime @default(now())
+}
